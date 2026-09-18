@@ -48,3 +48,10 @@ Har bir etap tekshiriladi va alohida commit orqali GitHub'ga yuboriladi.
 - Ruxsat etilgan statuslar, delivered bilan paid, notification deduplikatsiyasi.
 - Inventory adjustment, notification read/count va admin order filterlari.
 - Tekshiruv: 5 ta checkout/rollback/snapshot/ownership testi. PostgreSQL concurrency yakuniy etapda alohida tekshiriladi.
+
+## 6-etap
+
+- Har customer uchun bitta support conversation, ikki tomonlama message API.
+- Incremental after_id, read cursor, unread filter, message throttling va notificationlar.
+- Real DB dashboard statistikasi/grafiklari, customer active audit va Store Settings.
+- Tekshiruv: 3 ta messaging/dashboard testi.
