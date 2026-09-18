@@ -1,0 +1,6 @@
+Django==5.2.17
+djangorestframework==3.17.1
+drf-spectacular==0.30.0
+Pillow==11.3.0
+psycopg[binary]==3.3.4
+python-dotenv==1.2.1
