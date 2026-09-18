@@ -76,3 +76,29 @@ class ChangePasswordSerializer(StrictSerializerMixin, serializers.Serializer):
         except DjangoValidationError as exc:
             raise serializers.ValidationError({'new_password': exc.messages})
         return attrs
+
+
+class ProfileSerializer(StrictSerializerMixin, serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'full_name', 'email', 'phone', 'avatar', 'date_joined']
+        read_only_fields = ['id', 'email', 'date_joined']
+
+    validate_phone = RegisterSerializer.validate_phone
+
+
+class SettingsSerializer(StrictSerializerMixin, serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['preferred_language', 'marketing_consent']
+
+
+class AddressSerializer(StrictSerializerMixin, serializers.ModelSerializer):
+    class Meta:
+        from .models import Address
+        model = Address
+        exclude = ['user']
+        read_only_fields = ['id']
+        validators = []
+
+    validate_phone = RegisterSerializer.validate_phone

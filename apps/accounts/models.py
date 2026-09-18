@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.functions import Lower
 from django.core.validators import RegexValidator
+from apps.core.uploads import image_path, validate_image
 
 phone_validator = RegexValidator(r'^\+998\d{9}$', 'Use +998 followed by 9 digits.')
 
@@ -34,7 +35,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=13, validators=[phone_validator])
     role = models.CharField(max_length=8, choices=Role.choices, default=Role.CUSTOMER)
     preferred_language = models.CharField(max_length=2, choices=[('uz', 'Uzbek'), ('ru', 'Russian'), ('en', 'English')], default='uz')
-    avatar = models.ImageField(upload_to='avatars/', blank=True)
+    avatar = models.ImageField(upload_to=image_path, validators=[validate_image], blank=True)
     marketing_consent = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'phone']
@@ -49,3 +50,19 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
+    label = models.CharField(max_length=60)
+    recipient_name = models.CharField(max_length=150)
+    phone = models.CharField(max_length=13, validators=[phone_validator])
+    region = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    address_line = models.CharField(max_length=300)
+    landmark = models.CharField(max_length=300, blank=True)
+    is_default = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-is_default', 'id']
+        constraints = [models.UniqueConstraint(fields=['user'], condition=models.Q(is_default=True), name='one_default_address_per_user')]

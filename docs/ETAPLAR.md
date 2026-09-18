@@ -33,3 +33,10 @@ Har bir etap tekshiriladi va alohida commit orqali GitHub'ga yuboriladi.
 - Customer katalog qidiruv, filter, sort, pagination; admin CRUD API.
 - Avtomatik default variant, uch tildagi publish validatsiyasi, image upload himoyasi.
 - Tekshiruv: 4 ta katalog/permission/variant testi va Django check.
+
+## 4-etap
+
+- Serverdagi savat, favorite, manzillar, profil va sozlamalar API.
+- Miqdor/qoldiq tekshiruvi, unique savat/favorite, yagona default manzil.
+- Object ownership va protected profile maydonlari; cart mutation lock tartibi.
+- Tekshiruv: 4 ta customer data testi.
