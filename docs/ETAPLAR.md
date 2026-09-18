@@ -26,3 +26,10 @@ Har bir etap tekshiriladi va alohida commit orqali GitHub'ga yuboriladi.
 - Landing, login/register, til tanlash, xavfsiz page redirect va xato sahifalari.
 - Fetch API yordamchisi, CSRF, form loading/error, parolni korsatish va logout.
 - Tekshiruv: 3 ta sahifa/rol/til testi va Django check.
+
+## 3-etap
+
+- Category, Product, ProductVariant, ProductImage va DB constraintlari.
+- Customer katalog qidiruv, filter, sort, pagination; admin CRUD API.
+- Avtomatik default variant, uch tildagi publish validatsiyasi, image upload himoyasi.
+- Tekshiruv: 4 ta katalog/permission/variant testi va Django check.
