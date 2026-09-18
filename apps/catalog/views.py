@@ -63,6 +63,7 @@ class AdminMutationMixin:
     def perform_update(self, serializer):
         try:
             with transaction.atomic():
+                serializer.instance = type(serializer.instance).objects.select_for_update().get(pk=serializer.instance.pk)
                 serializer.save()
         except IntegrityError:
             raise Conflict('A record with these unique fields already exists.')

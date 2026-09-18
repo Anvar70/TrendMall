@@ -40,3 +40,11 @@ Har bir etap tekshiriladi va alohida commit orqali GitHub'ga yuboriladi.
 - Miqdor/qoldiq tekshiruvi, unique savat/favorite, yagona default manzil.
 - Object ownership va protected profile maydonlari; cart mutation lock tartibi.
 - Tekshiruv: 4 ta customer data testi.
+
+## 5-etap
+
+- Server quote, atomar checkout, UUID idempotency va user/cart/variant lock.
+- Order/address/item snapshotlari, stock jurnali, bir martalik cancel return.
+- Ruxsat etilgan statuslar, delivered bilan paid, notification deduplikatsiyasi.
+- Inventory adjustment, notification read/count va admin order filterlari.
+- Tekshiruv: 5 ta checkout/rollback/snapshot/ownership testi. PostgreSQL concurrency yakuniy etapda alohida tekshiriladi.
