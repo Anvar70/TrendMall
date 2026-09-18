@@ -1,0 +1,5 @@
+{% load static ui %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE|default:request.LANGUAGE_CODE }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="TrendBox"><title>TrendBox</title><link rel="stylesheet" href="{% static 'css/base.css' %}"></head>
+<body class="guest"><header class="guest-header"><a class="brand" href="/">trend<span>box</span><b aria-hidden="true">?</b></a>{% include 'components/language.html' %}<nav><a href="/login/">{% tr 'login' %}</a><a class="button small" href="/register/">{% tr 'register' %}</a></nav></header>
+<main id="main">{% block content %}{% endblock %}</main><footer>? TrendBox <a href="/admin/login/">{% tr 'admin_login' %}</a></footer>
+<div id="toast" role="status" hidden></div><script type="module" src="{% static 'js/guest.js' %}"></script></body></html>

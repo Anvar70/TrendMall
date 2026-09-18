@@ -19,3 +19,10 @@ Har bir etap tekshiriladi va alohida commit orqali GitHub'ga yuboriladi.
 - Rol yuborib huquq oshirish taqiqlandi; login/register uchun ham CSRF majburiy.
 - Xavfsiz `next`, no-store cache, auth throttling va interaktiv `create_store_admin` qo‘shildi.
 - Tekshiruv: Django system check va 6 ta autentifikatsiya testi.
+
+## 2-etap
+
+- Alohida Guest/Customer/Admin layout, mobil navigatsiya va uch til lugati.
+- Landing, login/register, til tanlash, xavfsiz page redirect va xato sahifalari.
+- Fetch API yordamchisi, CSRF, form loading/error, parolni korsatish va logout.
+- Tekshiruv: 3 ta sahifa/rol/til testi va Django check.
