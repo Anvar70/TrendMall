@@ -1,1 +1,1 @@
-{% extends 'layouts/admin.html' %}{% load ui %}{% block content %}<section class="panel"><p>{% tr 'empty' %}</p></section>{% endblock %}
+{% extends 'layouts/admin.html' %}{% load static ui %}{% block content %}<div id="page-content" aria-live="polite"><p>{% tr 'loading' %}</p></div>{% endblock %}{% block scripts %}<script type="module" src="{% static 'js/admin.js' %}"></script>{% endblock %}

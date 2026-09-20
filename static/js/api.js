@@ -7,6 +7,7 @@ export async function api(path, options = {}) {
   if (method !== 'GET') headers['X-CSRFToken'] = csrf;
   let body = options.body;
   if (body && !(body instanceof FormData)) { headers['Content-Type'] = 'application/json'; body = JSON.stringify(body); }
+  if (/^https?:/.test(path)) { const url=new URL(path); if(url.origin!==location.origin)throw new Error('Invalid API origin'); path=url.pathname+url.search; }
   const response = await fetch(path.startsWith('/') ? path : '/api/v1/' + path, {...options, body, headers, credentials: 'same-origin', cache: 'no-store'});
   const data = response.status === 204 ? null : await response.json().catch(() => ({}));
   if (!response.ok) {

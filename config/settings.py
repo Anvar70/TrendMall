@@ -26,7 +26,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates', 'DIRS': [BASE_DIR / 'templates'],
               'APP_DIRS': True, 'OPTIONS': {'context_processors': [
                   'django.template.context_processors.request', 'django.contrib.auth.context_processors.auth',
-                  'django.contrib.messages.context_processors.messages']}}]
+                  'django.contrib.messages.context_processors.messages', 'apps.core.context_processors.store_context']}}]
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 if os.getenv('DB_ENGINE', 'sqlite') == 'postgres':

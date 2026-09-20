@@ -55,3 +55,12 @@ Har bir etap tekshiriladi va alohida commit orqali GitHub'ga yuboriladi.
 - Incremental after_id, read cursor, unread filter, message throttling va notificationlar.
 - Real DB dashboard statistikasi/grafiklari, customer active audit va Store Settings.
 - Tekshiruv: 3 ta messaging/dashboard testi.
+
+## 7-etap
+
+- Katalog, mahsulot, sevimlilar, savat, checkout, profil, manzillar, buyurtmalar va chat ekranlari API bilan ulandi.
+- Admin mahsulot/kategoriya/variant CRUD formalari, rasm yuklash, ombor tuzatish, status boshqaruvi va statistikalar qo‘shildi.
+- Uch tildagi interfeys, moslashuvchan dizayn, modal formalari, pagination, loading/error va polling ishlaydi.
+- `seed_demo`: 6 kategoriya, 24 mahsulot, 48 variant, original lokal rasmlar, 6 buyurtma va 3 yozishma. Qayta ishga tushirish nusxa yaratmaydi.
+- Tekshiruv: oldingi 25 test va seed → register → catalog → cart → checkout → admin order → admin reply integratsiya testi o‘tdi. JavaScript ES module sintaksisi tekshirildi.
+- Brauzer ulanishi mavjud emasligi sabab vizual/responsive brauzer QA hali bajarilmadi; bu tekshiruv natijasi deb ko‘rsatilmaydi.
