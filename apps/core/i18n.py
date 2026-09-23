@@ -70,6 +70,8 @@ TRANSLATIONS = {
 
 
 TRANSLATIONS.update({
+    'footer_rights': ('Barcha huquqlar himoyalangan', 'Все права защищены', 'All rights reserved'),
+    'footer_contact': ('Biz bilan bog‘laning', 'Свяжитесь с нами', 'Contact us'),
     'required': ('Bu maydonni to‘ldiring.', 'Заполните это поле.', 'This field is required.'),
     'invalid': ('Qiymat yoki format noto‘g‘ri.', 'Неверное значение или формат.', 'Invalid value or format.'),
     'unique': ('Bunday yozuv allaqachon mavjud.', 'Такая запись уже существует.', 'This record already exists.'),
