@@ -21,7 +21,24 @@ from apps.orders.services import preview, checkout, transition
 
 
 def illustration(kind, index):
-    """Original, locally drawn demo illustrations; no external image licenses."""
+    """Return a realistic local catalog photo, with a deterministic drawn fallback."""
+    photo_map = {
+        'lamp': 'lamp.png',
+        'fan': 'fan.png',
+        'organizer': 'organizer.png',
+        'box': 'organizer.png',
+        'tools': 'tools.png',
+        'bottle': 'bottle.png',
+        'phone': 'electronics.png',
+        'charger': 'electronics.png',
+        'stand': 'electronics.png',
+        'cable': 'electronics.png',
+        'clock': 'electronics.png',
+        'pillow': 'organizer.png',
+    }
+    photo_path = settings.BASE_DIR / 'static' / 'images' / 'products' / photo_map.get(kind, 'organizer.png')
+    if photo_path.exists():
+        return photo_path.read_bytes()
     backgrounds = ['#e8edf2', '#eee7df', '#e5ece6', '#e7e8f0', '#f0e5dc', '#e6ecee']
     image = Image.new('RGB', (640, 640), backgrounds[index % len(backgrounds)])
     draw = ImageDraw.Draw(image)
@@ -117,9 +134,11 @@ class Command(BaseCommand):
                 'product': product, 'price': price + 10000, 'attributes': {'color': 'black'}, 'stock': 0})
             if created and index % 8 != 0:
                 adjust_stock(admin, alternate.pk, 10, 'Demo initial stock', 'INITIAL')
-            if not product.images.exists():
-                photo = ProductImage(product=product, is_primary=True, alt_uz=uz, alt_ru=ru, alt_en=en)
-                photo.image.save(slug+'.png', ContentFile(illustration(kind, index)), save=True)
+            photo = product.images.order_by('id').first()
+            if photo is None:
+                photo = ProductImage(product=product, is_primary=True)
+            photo.alt_uz, photo.alt_ru, photo.alt_en = uz, ru, en
+            photo.image.save(slug+'.png', ContentFile(illustration(kind, index)), save=True)
             variants.append(variant)
         for index, status in enumerate(['NEW', 'CONFIRMED', 'PACKING', 'SHIPPED', 'DELIVERED', 'CANCELLED']):
             customer = customers[index % len(customers)]
@@ -165,4 +184,3 @@ class Command(BaseCommand):
         user.full_clean()
         user.save()
         return user
-
