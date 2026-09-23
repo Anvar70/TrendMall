@@ -28,6 +28,8 @@ class AddressViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Address.objects.none()
         return Address.objects.filter(user=self.request.user)
 
     @transaction.atomic
@@ -41,6 +43,7 @@ class AddressViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def perform_update(self, serializer):
         User.objects.select_for_update().get(pk=self.request.user.pk)
+        serializer.instance = Address.objects.select_for_update().get(pk=serializer.instance.pk, user=self.request.user)
         if serializer.validated_data.get('is_default'):
             self.get_queryset().exclude(pk=serializer.instance.pk).update(is_default=False)
         serializer.save()

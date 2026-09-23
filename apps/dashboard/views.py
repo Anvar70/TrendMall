@@ -85,7 +85,7 @@ class DashboardView(APIView):
         return Response({'total_orders': orders.count(), 'new_orders': orders.filter(status='NEW').count(),
             'active_customers': User.objects.filter(role='CUSTOMER', is_active=True).count(),
             'active_products': Product.objects.filter(is_active=True, category__is_active=True).count(),
-            'low_stock_count': low_stock.count(), 'revenue': str(revenue), 'chart': chart,
+            'low_stock_count': low_stock.count(), 'revenue': str(revenue.quantize(Decimal('0.01'))), 'chart': chart,
             'unread_messages': Message.objects.filter(sender__role='CUSTOMER', read_at__isnull=True).count(),
             'recent_orders': OrderSerializer(date_filter(order_queryset(), request.query_params)[:5], many=True).data,
             'low_stock': VariantSerializer(low_stock[:5], many=True).data})

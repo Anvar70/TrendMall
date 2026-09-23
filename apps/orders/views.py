@@ -26,6 +26,8 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'public_number'
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Order.objects.none()
         return order_queryset().filter(customer=self.request.user)
 
     def create(self, request):

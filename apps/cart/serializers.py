@@ -20,24 +20,24 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'variant', 'name', 'image', 'price', 'stock', 'sku', 'attributes', 'slug', 'quantity', 'line_total', 'available', 'price_changed']
 
-    def get_name(self, obj):
+    def get_name(self, obj) -> str:
         return translated(obj.variant.product, 'name', self.context)
 
-    def get_image(self, obj):
+    def get_image(self, obj) -> str | None:
         image = obj.variant.image
         if not image:
             first = next(iter(obj.variant.product.images.all()), None)
             image = first.image if first else None
         return image.url if image else None
 
-    def get_line_total(self, obj):
+    def get_line_total(self, obj) -> str:
         return str(obj.variant.price * obj.quantity)
 
-    def get_available(self, obj):
+    def get_available(self, obj) -> bool:
         from .services import available
         return available(obj.variant) and obj.quantity <= obj.variant.stock
 
-    def get_price_changed(self, obj):
+    def get_price_changed(self, obj) -> bool:
         return obj.added_price != obj.variant.price
 
 

@@ -1,4 +1,4 @@
-from django.db.models import Count, Q, OuterRef, Subquery
+from django.db.models import Count, Q, OuterRef, Subquery, Max
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import generics
@@ -22,11 +22,19 @@ class MessagesView(ConversationMixin, generics.ListAPIView):
     serializer_class = MessageSerializer
     throttle_classes = [ScopedRateThrottle]
 
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response.data['read_through'] = self.conversation().messages.filter(
+            sender__role=request.user.role, read_at__isnull=False).aggregate(last=Max('id'))['last'] or 0
+        return response
+
     def get_throttles(self):
         self.throttle_scope = 'message' if self.request.method == 'POST' else None
         return super().get_throttles()
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Message.objects.none()
         qs = self.conversation().messages.select_related('sender')
         after = self.request.query_params.get('after_id', '0')
         if not after.isdigit():

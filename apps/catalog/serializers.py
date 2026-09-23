@@ -4,6 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 from apps.accounts.serializers import StrictSerializerMixin
 from .models import Category, Product, ProductVariant, ProductImage
+from apps.core.models import StoreSettings
 
 
 def translated(obj, field, context):
@@ -20,7 +21,7 @@ class CategorySerializer(StrictSerializerMixin, serializers.ModelSerializer):
         fields = ['id', 'slug', 'name', 'name_uz', 'name_ru', 'name_en', 'image', 'sort_order', 'is_active']
         read_only_fields = ['id', 'name']
 
-    def get_name(self, obj):
+    def get_name(self, obj) -> str:
         return translated(obj, 'name', self.context)
 
     def validate(self, attrs):
@@ -33,6 +34,10 @@ class CategorySerializer(StrictSerializerMixin, serializers.ModelSerializer):
 
 
 class VariantSerializer(StrictSerializerMixin, serializers.ModelSerializer):
+    def create(self, validated_data):
+        validated_data.setdefault('low_stock_threshold', StoreSettings.load().default_low_stock_threshold)
+        return super().create(validated_data)
+
     class Meta:
         model = ProductVariant
         exclude = ['canonical_attribute_key']
@@ -68,6 +73,27 @@ class ImageSerializer(StrictSerializerMixin, serializers.ModelSerializer):
         model = ProductImage
         fields = '__all__'
         read_only_fields = ['id']
+        validators = []
+
+    def validate(self, attrs):
+        if self.instance and 'product' in attrs and attrs['product'].pk != self.instance.product_id:
+            raise serializers.ValidationError({'product': 'An image cannot be moved to another product.'})
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        product = Product.objects.select_for_update().get(pk=validated_data['product'].pk)
+        if validated_data.get('is_primary'):
+            product.images.update(is_primary=False)
+        return super().create(validated_data)
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        product = Product.objects.select_for_update().get(pk=instance.product_id)
+        instance = ProductImage.objects.get(pk=instance.pk)
+        if validated_data.get('is_primary'):
+            product.images.exclude(pk=instance.pk).update(is_primary=False)
+        return super().update(instance, validated_data)
 
 
 class ProductSerializer(StrictSerializerMixin, serializers.ModelSerializer):
@@ -85,16 +111,16 @@ class ProductSerializer(StrictSerializerMixin, serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['id', 'created_at', 'updated_at']
 
-    def get_name(self, obj):
+    def get_name(self, obj) -> str:
         return translated(obj, 'name', self.context)
 
-    def get_description(self, obj):
+    def get_description(self, obj) -> str:
         return translated(obj, 'description', self.context)
 
-    def get_short_description(self, obj):
+    def get_short_description(self, obj) -> str:
         return translated(obj, 'short_description', self.context)
 
-    def get_category_name(self, obj):
+    def get_category_name(self, obj) -> str:
         return translated(obj.category, 'name', self.context)
 
     def validate(self, attrs):
@@ -114,7 +140,8 @@ class ProductSerializer(StrictSerializerMixin, serializers.ModelSerializer):
     def create(self, validated_data):
         price = validated_data.pop('default_price')
         product = super().create(validated_data)
-        ProductVariant.objects.create(product=product, sku=f'TB-{product.pk}-DEFAULT', price=price)
+        ProductVariant.objects.create(product=product, sku=f'TB-{product.pk}-DEFAULT', price=price,
+            low_stock_threshold=StoreSettings.load().default_low_stock_threshold)
         return product
 
     def to_representation(self, instance):

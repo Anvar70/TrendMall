@@ -16,7 +16,7 @@ class DashboardTests(TestCase):
         client.force_authenticate(admin)
         response = client.get('/api/v1/admin/dashboard/')
         self.assertEqual(response.status_code, 200, response.data)
-        self.assertEqual(response.data['revenue'], '100')
+        self.assertEqual(response.data['revenue'], '100.00')
         self.assertEqual(response.data['total_orders'], 3)
         response = client.post(f'/api/v1/admin/customers/{customer.pk}/set-active/', {'is_active': False, 'reason': 'Requested by customer'})
         self.assertEqual(response.status_code, 200)

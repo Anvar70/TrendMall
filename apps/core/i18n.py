@@ -70,6 +70,23 @@ TRANSLATIONS = {
 
 
 TRANSLATIONS.update({
+    'required': ('Bu maydonni to‘ldiring.', 'Заполните это поле.', 'This field is required.'),
+    'invalid': ('Qiymat yoki format noto‘g‘ri.', 'Неверное значение или формат.', 'Invalid value or format.'),
+    'unique': ('Bunday yozuv allaqachon mavjud.', 'Такая запись уже существует.', 'This record already exists.'),
+    'field_protected': ('Bu maydonni o‘zgartirish mumkin emas.', 'Это поле нельзя изменять.', 'This field cannot be changed.'),
+    'translation_required': ('Nashr qilish uchun uch tildagi matnlarni to‘ldiring.', 'Заполните тексты на трёх языках перед публикацией.', 'Complete all three translations before publishing.'),
+    'password_mismatch': ('Parollar mos kelmadi.', 'Пароли не совпадают.', 'Passwords do not match.'),
+    'password_invalid': ('Parol kamida 8 belgi bo‘lsin, juda oddiy yoki faqat raqamlardan iborat bo‘lmasin.', 'Пароль должен содержать минимум 8 символов, не быть слишком простым или полностью цифровым.', 'Use at least 8 characters and avoid common or entirely numeric passwords.'),
+    'phone_invalid': ('Telefonni +998 va 9 ta raqam bilan kiriting.', 'Введите +998 и 9 цифр номера.', 'Use +998 followed by 9 digits.'),
+    'image_invalid': ('JPEG, PNG yoki WebP rasm yuklang: 5 MB, 8000 piksel va 20 megapikseldan oshmasin.', 'Загрузите JPEG, PNG или WebP: до 5 МБ, 8000 пикселей и 20 мегапикселей.', 'Upload JPEG, PNG or WebP: at most 5 MB, 8000 pixels and 20 megapixels.'),
+    'length_invalid': ('Qiymat uzunligi ruxsat etilgan chegaradan tashqarida.', 'Длина значения вне допустимых границ.', 'The value length is outside the allowed range.'),
+    'number_invalid': ('Son ruxsat etilgan chegaradan tashqarida.', 'Число вне допустимых границ.', 'The number is outside the allowed range.'),
+    'permission_denied': ('Bu amalni bajarish mumkin emas.', 'Действие запрещено.', 'This action is not allowed.'),
+    'method_not_allowed': ('Bu so‘rov usuli qo‘llanmaydi.', 'Метод запроса не поддерживается.', 'This request method is not allowed.'),
+    'unavailable_stock': ('Tanlangan mahsulot yoki miqdor mavjud emas.', 'Товар или нужное количество недоступны.', 'The selected item or quantity is unavailable.'),
+    'quote_changed': ('Narx, manzil yoki savat o‘zgardi. Hisobni qayta tekshirib tasdiqlang.', 'Цена, адрес или корзина изменились. Проверьте расчёт и подтвердите снова.', 'The price, address or cart changed. Review and confirm again.'),
+    'archive_required': ('Tarixda ishlatilgan yozuvni o‘chirish mumkin emas. Arxivlang.', 'Запись используется в истории. Архивируйте вместо удаления.', 'This record has history. Archive it instead of deleting.'),
+    'empty_cart': ('Savatingiz bo‘sh.', 'Корзина пуста.', 'Your cart is empty.'),
     'color': ('Rang', 'Цвет', 'Color'),
     'black': ('Qora', 'Чёрный', 'Black'),
     'white': ('Oq', 'Белый', 'White'),

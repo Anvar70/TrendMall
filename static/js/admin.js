@@ -13,7 +13,7 @@ async function definitions(kind){
   return {fields:[{name:'product',type:'select',options:products.map(p=>[p.id,p.name]),required:true},{name:'sku',required:true},{name:'attributes',type:'json'},decimal('price'),decimal('compare_at_price'),number('low_stock_threshold'),checkbox('is_active'),{name:'image',type:'file'}],columns:[['sku'],['product',r=>products.find(p=>p.id===r.product)?.name||r.product],['price',r=>money(r.price)],['stock'],['is_active',r=>badge(r.is_active?'yes':'no')]]};
 }
 async function crud(kind){
-  const definition=await definitions(kind),target=el('div'),search=field('search');
+  const definition=await definitions(kind),target=el('div'),search=field('search',new URLSearchParams(location.search).get('search'));
   const edit=record=>{const specs=definition.fields.filter(f=>!(record&&f.name==='default_price'));editDialog(record?'edit':'create',specs,record||{is_active:kind!=='products',sort_order:0,low_stock_threshold:5},async values=>{await mutate('admin/'+kind+'/'+(record?record.id+'/':''),values,record?'PATCH':'POST');await refresh();});};
   const toolbar=el('div',{class:'toolbar'},search,button('create',()=>edit(),''));root.replaceChildren(toolbar,target);
   let current='admin/'+kind+'/'+location.search;
@@ -21,7 +21,15 @@ async function crud(kind){
   let timer;search.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(()=>refresh('admin/'+kind+'/?search='+encodeURIComponent(search.querySelector('input').value)),300);});
   async function images(product){
     const content=el('div');const modal=dialog('images',content);
-    const render=async()=>{const current=await api('admin/products/'+product.id+'/');content.replaceChildren(el('div',{class:'image-manager'},current.images.map(img=>el('div',{},image(img.image,current.name),button('delete',async()=>{if(confirm(t('confirm'))){await mutate('admin/images/'+img.id+'/',undefined,'DELETE');await render();await refresh();}})))),makeForm([{name:'image',type:'file',required:true},'alt_uz','alt_ru','alt_en',number('sort_order'),checkbox('is_primary')],{sort_order:0,is_primary:!current.images.length},async data=>{data.append('product',product.id);await mutate('admin/images/',data);await render();await refresh();},'create'));};await render();
+    const render=async()=>{
+      const current=await api('admin/products/'+product.id+'/');
+      const specs=['alt_uz','alt_ru','alt_en',number('sort_order'),checkbox('is_primary')];
+      const gallery=el('div',{class:'image-manager'},current.images.map(img=>el('div',{},
+        image(img.image,current.name), img.is_primary?badge('is_primary'):null,
+        button('edit',()=>editDialog('edit',specs,img,async data=>{await mutate('admin/images/'+img.id+'/',data,'PATCH');await render();await refresh();})),
+        button('delete',async()=>{if(confirm(t('confirm'))){await mutate('admin/images/'+img.id+'/',undefined,'DELETE');await render();await refresh();}}))));
+      content.replaceChildren(gallery,makeForm([{name:'image',type:'file',required:true},...specs],{sort_order:0,is_primary:!current.images.length},async data=>{data.append('product',product.id);await mutate('admin/images/',data);await render();await refresh();},'create'));
+    };await render();
   }
   await refresh();
 }

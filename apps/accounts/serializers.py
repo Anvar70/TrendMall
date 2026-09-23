@@ -28,7 +28,7 @@ class RegisterSerializer(StrictSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['full_name', 'email', 'phone', 'password', 'password_confirm']
-        extra_kwargs = {'email': {'validators': []}, 'phone': {'validators': []}}
+        extra_kwargs = {'email': {'validators': []}, 'phone': {'validators': [], 'max_length': 32}}
 
     def validate_email(self, value):
         value = value.strip().lower()
@@ -83,6 +83,7 @@ class ProfileSerializer(StrictSerializerMixin, serializers.ModelSerializer):
         model = User
         fields = ['id', 'full_name', 'email', 'phone', 'avatar', 'date_joined']
         read_only_fields = ['id', 'email', 'date_joined']
+        extra_kwargs = {'phone': {'validators': [], 'max_length': 32}}
 
     validate_phone = RegisterSerializer.validate_phone
 
@@ -100,5 +101,6 @@ class AddressSerializer(StrictSerializerMixin, serializers.ModelSerializer):
         exclude = ['user']
         read_only_fields = ['id']
         validators = []
+        extra_kwargs = {'phone': {'validators': [], 'max_length': 32}}
 
     validate_phone = RegisterSerializer.validate_phone

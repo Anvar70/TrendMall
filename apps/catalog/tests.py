@@ -44,4 +44,5 @@ class CatalogTests(TestCase):
         self.client.force_authenticate(self.admin)
         data = {'product': product.pk, 'sku': 'B', 'price': '50.00', 'attributes': {'Color': ' RED '}}
         self.assertEqual(self.client.post('/api/v1/admin/variants/', data, format='json').status_code, 400)
-        self.assertEqual(self.client.patch('/api/v1/admin/variants/1/', {'stock': 99}, format='json').status_code, 400)
+        variant = ProductVariant.objects.get(sku='A')
+        self.assertEqual(self.client.patch(f'/api/v1/admin/variants/{variant.pk}/', {'stock': 99}, format='json').status_code, 400)

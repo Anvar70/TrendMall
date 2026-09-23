@@ -16,6 +16,7 @@ class CartView(APIView):
 
 class CartItemsView(generics.GenericAPIView):
     serializer_class = CartMutationSerializer
+    http_method_names = ['post', 'options']
 
     def post(self, request):
         data = self.get_serializer(data=request.data)
@@ -40,9 +41,12 @@ class CartItemsView(generics.GenericAPIView):
 
 class FavoritesView(generics.ListAPIView):
     serializer_class = FavoriteSerializer
+    http_method_names = ['get', 'post', 'head', 'options']
 
     def get_queryset(self):
         from django.db.models import Prefetch
+        if getattr(self, 'swagger_fake_view', False):
+            return Favorite.objects.none()
         return Favorite.objects.filter(user=self.request.user).prefetch_related(Prefetch('product', queryset=products()))
 
     def post(self, request):
@@ -58,3 +62,11 @@ class FavoritesView(generics.ListAPIView):
         favorite = get_object_or_404(Favorite, user=request.user, product_id=product_id)
         favorite.delete()
         return Response(status=204)
+
+
+class CartItemDetailView(CartItemsView):
+    http_method_names = ['patch', 'delete', 'options']
+
+
+class FavoriteDetailView(FavoritesView):
+    http_method_names = ['delete', 'options']

@@ -79,6 +79,13 @@ class AdminCategoryViewSet(AdminMutationMixin, viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        text = self.request.query_params.get('search')
+        if text:
+            qs = qs.filter(Q(name_uz__icontains=text) | Q(name_ru__icontains=text) | Q(name_en__icontains=text))
+        return qs
+
 
 class AdminProductViewSet(AdminMutationMixin, viewsets.ModelViewSet):
     serializer_class = ProductSerializer
@@ -86,7 +93,8 @@ class AdminProductViewSet(AdminMutationMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         qs = products()
         if self.request.query_params.get('search'):
-            qs = qs.filter(name_uz__icontains=self.request.query_params['search'])
+            text = self.request.query_params['search']
+            qs = qs.filter(Q(name_uz__icontains=text) | Q(name_ru__icontains=text) | Q(name_en__icontains=text) | Q(variants__sku__icontains=text)).distinct()
         return qs
 
 
@@ -95,13 +103,17 @@ class AdminVariantViewSet(AdminMutationMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = ProductVariant.objects.select_related('product').all()
+        if self.request.query_params.get('search'):
+            qs = qs.filter(sku__icontains=self.request.query_params['search'])
         product = self.request.query_params.get('product')
         if product and product.isdigit():
             qs = qs.filter(product_id=product)
         return qs
 
+    @transaction.atomic
     def perform_destroy(self, instance):
-        if instance.product.variants.count() <= 1:
+        product = Product.objects.select_for_update().get(pk=instance.product_id)
+        if product.variants.count() <= 1:
             raise Conflict('Keep at least one variant for the product.')
         super().perform_destroy(instance)
 
@@ -109,3 +121,7 @@ class AdminVariantViewSet(AdminMutationMixin, viewsets.ModelViewSet):
 class AdminImageViewSet(AdminMutationMixin, viewsets.ModelViewSet):
     serializer_class = ImageSerializer
     queryset = ProductImage.objects.all()
+
+    def perform_update(self, serializer):
+        # ImageSerializer locks the product before updating any gallery row.
+        serializer.save()

@@ -1,10 +1,16 @@
 from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from apps.core.schema import SchemaAccess
 
 urlpatterns = [path('api/v1/', include('apps.messaging.urls')), path('api/v1/', include('apps.dashboard.urls')), path('api/v1/', include('apps.orders.urls')), path('api/v1/', include('apps.inventory.urls')), path('api/v1/', include('apps.notifications.urls')), path('api/v1/', include('apps.cart.urls')), path('api/v1/', include('apps.accounts.customer_urls')), path('api/v1/', include('apps.catalog.urls')), path('api/v1/auth/', include('apps.accounts.urls')), path('', include('apps.storefront.urls'))]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += [
+    path('api/schema/', SpectacularAPIView.as_view(permission_classes=[SchemaAccess]), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema', permission_classes=[SchemaAccess]), name='api-docs'),
+]
 handler403 = 'apps.storefront.views.error403'
 handler404 = 'apps.storefront.views.error404'
 handler500 = 'apps.storefront.views.error500'

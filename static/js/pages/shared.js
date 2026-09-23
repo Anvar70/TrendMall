@@ -48,13 +48,14 @@ export async function messagesPage(){
   const sendForm=el('form',{class:'message-form'},input,submit);
   const endpoint=()=>admin?'admin/conversations/'+selected+'/':'conversation/';
   panel.append(heading,thread,sendForm);root.replaceChildren(el('div',{class:admin?'chat-layout':'chat-layout customer-chat'},admin?list:null,panel));
-  const add=message=>el('article',{class:'message '+(message.sender_role===(admin?'ADMIN':'CUSTOMER')?'own':'')},el('strong',{},message.sender_name||t('support')),el('p',{class:'preserve-text'},message.body),el('small',{},date(message.created_at)+' · '+t(message.read_at?'read':'unread')));
+  const add=message=>el('article',{'data-message-id':message.id,'data-created-at':message.created_at,class:'message '+(message.sender_role===(admin?'ADMIN':'CUSTOMER')?'own':'')},el('strong',{},message.sender_name||t('support')),el('p',{class:'preserve-text'},message.body),el('small',{},date(message.created_at)+' · '+t(message.read_at?'read':'unread')));
   async function fetchMessages(){
     if(admin&&!selected)return;
     const version=threadVersion;
+    const atBottom=thread.scrollHeight-thread.scrollTop-thread.clientHeight<60;
     let next=endpoint()+'messages/?after_id='+cursor+'&page_size=48';
-    while(next){const data=await api(next);if(version!==threadVersion)return;for(const message of data.results){thread.append(add(message));cursor=Math.max(cursor,message.id);}next=data.next?new URL(data.next).pathname+new URL(data.next).search:null;}
-    if(cursor&&!document.hidden){thread.scrollTop=thread.scrollHeight;await api(endpoint()+'read/',{method:'POST',body:{last_seen_message_id:cursor}});}
+    while(next){const data=await api(next);if(version!==threadVersion)return;for(const message of data.results){thread.append(add(message));cursor=Math.max(cursor,message.id);}for(const node of thread.querySelectorAll('.message.own')){if(Number(node.dataset.messageId)<=data.read_through)node.querySelector('small').textContent=date(node.dataset.createdAt)+' · '+t('read');}next=data.next?new URL(data.next).pathname+new URL(data.next).search:null;}
+    if(cursor&&!document.hidden&&atBottom){thread.scrollTop=thread.scrollHeight;await api(endpoint()+'read/',{method:'POST',body:{last_seen_message_id:cursor}});}
   }
   async function choose(id,name){selected=id;threadVersion++;cursor=0;thread.replaceChildren();heading.textContent=name||t('support');if(stop)stop();sendForm.hidden=false;await fetchMessages();stop=poll(fetchMessages,5000);}
   sendForm.addEventListener('submit',async event=>{event.preventDefault();if(!input.value.trim())return;await busy(submit,async()=>{try{await api(endpoint()+'messages/',{method:'POST',body:{body:input.value}});input.value='';await fetchMessages();}catch(exc){toast(t(exc.data?.code||'error'));}});});

@@ -90,8 +90,9 @@ export function makeForm(specs, values, save, label='save') {
   return form;
 }
 export function dialog(title, content) {
-  const heading=el('h2',{id:'dialog-title'},t(title));
-  const modal=el('dialog',{'aria-labelledby':'dialog-title',class:'form-dialog'},el('div',{class:'dialog-heading'},heading,button('close',()=>modal.close())),content);
+  const titleId='dialog-'+crypto.randomUUID();
+  const heading=el('h2',{id:titleId},t(title));
+  const modal=el('dialog',{'aria-labelledby':titleId,class:'form-dialog'},el('div',{class:'dialog-heading'},heading,button('close',()=>modal.close())),content);
   document.body.append(modal);modal.addEventListener('close',()=>modal.remove());modal.showModal();return modal;
 }
 export function editDialog(title,specs,values,save) {

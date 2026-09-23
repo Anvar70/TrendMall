@@ -68,4 +68,8 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_THROTTLE_RATES': {'auth': '20/min', 'message': '30/min'},
 }
-SPECTACULAR_SETTINGS = {'TITLE': 'TrendBox API', 'VERSION': '1.0.0', 'SERVE_INCLUDE_SCHEMA': False}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'TrendBox API', 'VERSION': '1.0.0', 'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'POSTPROCESSING_HOOKS': ['drf_spectacular.hooks.postprocess_schema_enums', 'apps.core.schema.errors_hook'],
+}

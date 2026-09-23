@@ -40,7 +40,7 @@ async function product(){
   const variants=p.variants.filter(v=>v.is_active);
   const hero=image(p.images[0]?.image,p.name,'detail-image');
   const gallery=el('div',{class:'product-gallery'},hero,el('div',{class:'thumbnails'},p.images.map(img=>el('button',{type:'button',class:'thumbnail',onclick:()=>hero.src=img.image},image(img.image,img['alt_'+lang]||p.name)))));
-  const selector=el('select',{'aria-label':t('choose_variant')},el('option',{value:''},t('choose_variant')),variants.map(v=>el('option',{value:v.id},Object.entries(v.attributes).map(([k,value])=>k+': '+value).join(' / ') || v.sku)));
+  const selector=el('select',{'aria-label':t('choose_variant')},el('option',{value:''},t('choose_variant')),variants.map(v=>el('option',{value:v.id},Object.entries(v.attributes).map(([k,value])=>t(k)+': '+t(value)).join(' / ') || v.sku)));
   const quantity=el('input',{type:'number',min:1,value:1,'aria-label':t('quantity')});
   const price=el('div',{class:'detail-price'}),stock=el('p');
   const add=button('add_cart',async()=>{await mutate('cart/items/',{variant:Number(selector.value),quantity:Number(quantity.value)});},'');add.disabled=true;
