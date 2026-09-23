@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 from uuid import NAMESPACE_URL, uuid5
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageEnhance, ImageOps
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.files.base import ContentFile
@@ -38,7 +38,18 @@ def illustration(kind, index):
     }
     photo_path = settings.BASE_DIR / 'static' / 'images' / 'products' / photo_map.get(kind, 'organizer.png')
     if photo_path.exists():
-        return photo_path.read_bytes()
+        source = Image.open(photo_path).convert('RGB')
+        # Keep each catalog card visually distinct while preserving the product.
+        zoom = 1.0 + (index % 4) * 0.035
+        center = (0.42 + (index % 3) * 0.08, 0.5)
+        image = ImageOps.fit(source, (640, 640), method=Image.Resampling.LANCZOS, centering=center, bleed=min(0.04, (zoom - 1) / 2))
+        if index % 2:
+            image = ImageOps.mirror(image)
+        image = ImageEnhance.Color(image).enhance(0.88 + (index % 5) * 0.06)
+        image = ImageEnhance.Contrast(image).enhance(0.96 + (index % 4) * 0.025)
+        buffer = BytesIO()
+        image.save(buffer, format='JPEG', quality=90, optimize=True)
+        return buffer.getvalue()
     backgrounds = ['#e8edf2', '#eee7df', '#e5ece6', '#e7e8f0', '#f0e5dc', '#e6ecee']
     image = Image.new('RGB', (640, 640), backgrounds[index % len(backgrounds)])
     draw = ImageDraw.Draw(image)
@@ -138,7 +149,7 @@ class Command(BaseCommand):
             if photo is None:
                 photo = ProductImage(product=product, is_primary=True)
             photo.alt_uz, photo.alt_ru, photo.alt_en = uz, ru, en
-            photo.image.save(slug+'.png', ContentFile(illustration(kind, index)), save=True)
+            photo.image.save(slug+'.jpg', ContentFile(illustration(kind, index)), save=True)
             variants.append(variant)
         for index, status in enumerate(['NEW', 'CONFIRMED', 'PACKING', 'SHIPPED', 'DELIVERED', 'CANCELLED']):
             customer = customers[index % len(customers)]
