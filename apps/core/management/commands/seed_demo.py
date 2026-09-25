@@ -40,6 +40,8 @@ def illustration(kind, index, slug=None):
         'packing-cubes': 'packing-cubes.png', 'travel-pillow': 'travel-pillow.png',
         'luggage-tag': 'luggage-tag.png', 'lunch-box': 'lunch-box.png',
         'kitchen-scale': 'kitchen.png', 'silicone-tools': 'kitchen.png',
+        'charger': 'charger.png', 'phone-pouch': 'phone-pouch.png',
+        'usb-c-cable': 'cable-single.png', 'phone-stand': 'phone-stand.png',
     }
     photo_path = settings.BASE_DIR / 'static' / 'images' / 'products' / slug_map.get(slug, photo_map.get(kind, 'organizer.png'))
     if photo_path.exists():
