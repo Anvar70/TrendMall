@@ -111,6 +111,16 @@ def illustration(kind, index):
     return buffer.getvalue()
 
 
+def variant_photo(kind, index, dark=False):
+    image = Image.open(BytesIO(illustration(kind, index))).convert('RGB')
+    if dark:
+        image = ImageEnhance.Brightness(image).enhance(0.52)
+        image = ImageEnhance.Contrast(image).enhance(1.08)
+    buffer = BytesIO()
+    image.save(buffer, format='JPEG', quality=90, optimize=True)
+    return buffer.getvalue()
+
+
 class Command(BaseCommand):
     help = 'Create an idempotent local demo: 6 categories, 24 products and complete store activity.'
 
@@ -136,15 +146,23 @@ class Command(BaseCommand):
                 defaults['description_' + language] = names[language] + '. ' + details[language]
             product, _ = Product.objects.get_or_create(slug=slug, defaults=defaults)
             variant, created = ProductVariant.objects.get_or_create(sku=f'DEMO-{index+1:03}-A', defaults={
-                'product': product, 'price': price, 'compare_at_price': price + 20000, 'stock': 0})
+                'product': product, 'price': price, 'compare_at_price': price + 20000, 'attributes': {'color': 'white'}, 'stock': 0})
+            if variant.attributes != {'color': 'white'}:
+                variant.attributes = {'color': 'white'}
+                variant.save(update_fields=['attributes', 'canonical_attribute_key'])
             if created:
                 stock = 0 if index % 8 == 0 else 3 if index % 8 == 1 else 25
                 if stock:
                     adjust_stock(admin, variant.pk, stock, 'Demo initial stock', 'INITIAL')
             alternate, created = ProductVariant.objects.get_or_create(sku=f'DEMO-{index+1:03}-B', defaults={
                 'product': product, 'price': price + 10000, 'attributes': {'color': 'black'}, 'stock': 0})
+            if alternate.attributes != {'color': 'black'}:
+                alternate.attributes = {'color': 'black'}
+                alternate.save(update_fields=['attributes', 'canonical_attribute_key'])
             if created and index % 8 != 0:
                 adjust_stock(admin, alternate.pk, 10, 'Demo initial stock', 'INITIAL')
+            variant.image.save(slug+'-white.jpg', ContentFile(variant_photo(kind, index)), save=True)
+            alternate.image.save(slug+'-black.jpg', ContentFile(variant_photo(kind, index + 1, dark=True)), save=True)
             photo = product.images.order_by('id').first()
             if photo is None:
                 photo = ProductImage(product=product, is_primary=True)
