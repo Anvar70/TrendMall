@@ -20,7 +20,7 @@ from apps.orders.models import Order
 from apps.orders.services import preview, checkout, transition
 
 
-def illustration(kind, index):
+def illustration(kind, index, slug=None):
     """Return a realistic local catalog photo, with a deterministic drawn fallback."""
     photo_map = {
         'lamp': 'lamp.png',
@@ -36,7 +36,12 @@ def illustration(kind, index):
         'clock': 'electronics.png',
         'pillow': 'organizer.png',
     }
-    photo_path = settings.BASE_DIR / 'static' / 'images' / 'products' / photo_map.get(kind, 'organizer.png')
+    slug_map = {
+        'packing-cubes': 'packing-cubes.png', 'travel-pillow': 'travel-pillow.png',
+        'luggage-tag': 'luggage-tag.png', 'lunch-box': 'lunch-box.png',
+        'kitchen-scale': 'kitchen.png', 'silicone-tools': 'kitchen.png',
+    }
+    photo_path = settings.BASE_DIR / 'static' / 'images' / 'products' / slug_map.get(slug, photo_map.get(kind, 'organizer.png'))
     if photo_path.exists():
         source = Image.open(photo_path).convert('RGB')
         # Keep each catalog card visually distinct while preserving the product.
@@ -111,8 +116,8 @@ def illustration(kind, index):
     return buffer.getvalue()
 
 
-def variant_photo(kind, index, dark=False):
-    image = Image.open(BytesIO(illustration(kind, index))).convert('RGB')
+def variant_photo(kind, index, slug=None, dark=False):
+    image = Image.open(BytesIO(illustration(kind, index, slug))).convert('RGB')
     if dark:
         image = ImageEnhance.Brightness(image).enhance(0.52)
         image = ImageEnhance.Contrast(image).enhance(1.08)
@@ -161,13 +166,13 @@ class Command(BaseCommand):
                 alternate.save(update_fields=['attributes', 'canonical_attribute_key'])
             if created and index % 8 != 0:
                 adjust_stock(admin, alternate.pk, 10, 'Demo initial stock', 'INITIAL')
-            variant.image.save(slug+'-white.jpg', ContentFile(variant_photo(kind, index)), save=True)
-            alternate.image.save(slug+'-black.jpg', ContentFile(variant_photo(kind, index + 1, dark=True)), save=True)
+            variant.image.save(slug+'-white.jpg', ContentFile(variant_photo(kind, index, slug)), save=True)
+            alternate.image.save(slug+'-black.jpg', ContentFile(variant_photo(kind, index + 1, slug, dark=True)), save=True)
             photo = product.images.order_by('id').first()
             if photo is None:
                 photo = ProductImage(product=product, is_primary=True)
             photo.alt_uz, photo.alt_ru, photo.alt_en = uz, ru, en
-            photo.image.save(slug+'.jpg', ContentFile(illustration(kind, index)), save=True)
+            photo.image.save(slug+'.jpg', ContentFile(illustration(kind, index, slug)), save=True)
             variants.append(variant)
         for index, status in enumerate(['NEW', 'CONFIRMED', 'PACKING', 'SHIPPED', 'DELIVERED', 'CANCELLED']):
             customer = customers[index % len(customers)]
