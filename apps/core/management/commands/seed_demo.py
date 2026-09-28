@@ -133,7 +133,7 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
-        if not settings.DEBUG:
+        if not settings.DEBUG and os.getenv('ALLOW_DEMO_SEED', '').lower() != 'true':
             raise CommandError('seed_demo is disabled when DEBUG=False.')
         admin = self.account('admin@trendbox.local', 'ADMIN', 'Demo Admin', 'DEMO_ADMIN_PASSWORD')
         customers = [self.account(f'customer{n}@trendbox.local', 'CUSTOMER', f'Demo Customer {n}', 'DEMO_CUSTOMER_PASSWORD') for n in range(1, 4)]

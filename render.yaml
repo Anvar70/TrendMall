@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: trendbox
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate && ALLOW_DEMO_SEED=true python manage.py seed_demo && gunicorn config.wsgi:application --log-file -
+    healthCheckPath: /
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: DEMO_ADMIN_PASSWORD
+        generateValue: true
+      - key: DEMO_CUSTOMER_PASSWORD
+        generateValue: true
